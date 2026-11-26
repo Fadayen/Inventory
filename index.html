@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Permission Portal | PT Tokai Rubber Indonesia</title>
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2310233f'/%3E%3Cpath d='M15 18h34v8H37v22h-9V26H15z' fill='%23fff'/%3E%3Ccircle cx='47' cy='46' r='8' fill='%232f73d9' stroke='%23fff' stroke-width='2'/%3E%3C/svg%3E">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%230b1830'/%3E%3Cpath d='M50 10L84 24V48C84 69 68 84 50 91C32 84 16 69 16 48V24Z' fill='%232f73d9' stroke='white' stroke-width='4'/%3E%3Cpath d='M33 50L45 62L68 39' fill='none' stroke='white' stroke-width='8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E" />
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
@@ -83,7 +83,7 @@ function toggleSide(){document.getElementById('sidebar').classList.toggle('show'
 function showPage(id){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById(id).classList.add('active');document.querySelectorAll('.nav-link').forEach(a=>a.classList.toggle('active',a.dataset.page===id));const titles={dashboard:'Dashboard',submit:'Buat Pengajuan',mine:'Pengajuan Saya',approval:'Approval Atasan',security:'Security Dashboard',employees:'Master Employee',reports:'Report'};document.getElementById('pageTitle').textContent=titles[id]||id;renderAll();document.getElementById('sidebar').classList.remove('show')}
 document.querySelectorAll('.nav-link').forEach(a=>a.addEventListener('click',()=>showPage(a.dataset.page)));
 function clean(s){return String(s??'').trim()}
-function findEmp(q){q=clean(q).toLowerCase();return employees.find(e=>`${e.name} ${e.nik}`.toLowerCase()===q)||employees.find(e=>e.nik.toLowerCase()===q)||employees.find(e=>e.name.toLowerCase()===q)}
+function findEmp(q){q=clean(q).toLowerCase();let nikPart=q.split(' — ').pop().trim();let namePart=q.includes(' — ')?q.split(' — ')[0].trim():q;return employees.find(e=>`${e.name} ${e.nik}`.toLowerCase()===q)||employees.find(e=>String(e.nik).toLowerCase()===q||String(e.nik).toLowerCase()===nikPart)||employees.find(e=>String(e.name).toLowerCase()===namePart)}
 function updateEmployeeOptions(){document.getElementById('employeeOptions').innerHTML=employees.filter(e=>e.status!=='Nonaktif').map(e=>`<option value="${escapeHtml(e.name)} — ${escapeHtml(e.nik)}"></option>`).join('')}
 function escapeHtml(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 document.getElementById('employeeSearch').addEventListener('input',function(){let e=findEmp(this.value);if(!e){let val=this.value.split(' — ')[0];e=employees.find(x=>x.name.toLowerCase()===val.toLowerCase())}if(e){this.dataset.empId=e.id;document.getElementById('infoNik').textContent=e.nik;document.getElementById('infoDept').textContent=e.dept;document.getElementById('employeeInfo').style.display='grid'}else{this.dataset.empId='';document.getElementById('employeeInfo').style.display='none'}});
@@ -95,25 +95,88 @@ function deleteEmployee(id){let e=employees.find(x=>x.id===id);if(!e)return;if(!
 function renderEmployees(){let q=clean(document.getElementById('employeeFilter').value).toLowerCase(),dept=document.getElementById('deptFilter').value;let list=employees.filter(e=>(!q||`${e.name} ${e.nik} ${e.dept}`.toLowerCase().includes(q))&&(!dept||e.dept===dept));document.getElementById('employeeTable').innerHTML=list.map(e=>`<tr><td>${escapeHtml(e.nik)}</td><td class="fw-semibold">${escapeHtml(e.name)}</td><td>${escapeHtml(e.dept)}</td><td><span class="badge-soft ${e.status==='Nonaktif'?'inactive':'approved'}">${e.status||'Aktif'}</span></td><td><button class="btn btn-sm btn-outline-primary me-1" onclick='editEmployee("${e.id}")'><i class="bi bi-pencil"></i></button><button class="btn btn-sm btn-outline-danger" onclick='deleteEmployee("${e.id}")'><i class="bi bi-person-x"></i></button></td></tr>`).join('')||`<tr><td colspan="5" class="empty">Belum ada data karyawan. Import Excel atau tambah data.</td></tr>`;document.getElementById('employeeCount').textContent=`Menampilkan ${list.length} dari ${employees.length} karyawan`;let depts=[...new Set(employees.map(e=>e.dept).filter(Boolean))].sort();let sel=document.getElementById('deptFilter'),old=sel.value;sel.innerHTML='<option value="">Semua Departemen</option>'+depts.map(d=>`<option>${escapeHtml(d)}</option>`).join('');sel.value=depts.includes(old)?old:'';updateEmployeeOptions()}
 function editEmployee(id){openEmployeeModal(employees.find(e=>e.id===id))}
 function importExcel(input){
- let file=input.files[0];if(!file)return;
- let reader=new FileReader();reader.onload=ev=>{try{
-  let wb=XLSX.read(ev.target.result,{type:'array'});const norm=v=>String(v??'').trim().toUpperCase().replace(/[^A-Z0-9]/g,'');
-  let found=null;
-  for(const sheetName of wb.SheetNames){
-   const matrix=XLSX.utils.sheet_to_json(wb.Sheets[sheetName],{header:1,defval:''});
-   for(let i=0;i<Math.min(matrix.length,100);i++){
-    const row=matrix[i].map(norm);
-    const find=terms=>row.findIndex(cell=>terms.some(t=>cell===norm(t)||cell.includes(norm(t))));
-    let n=find(['NIK','EMPLOYEE ID','ID KARYAWAN','NO NIK']),nm=find(['NAME','NAMA','EMPLOYEE NAME']),d=find(['DEPT','DEPARTMENT','DEPARTEMEN','DIVISION']);
-    if(n>=0&&nm>=0&&d>=0){found={sheetName,matrix,headerIndex:i,nikIdx:n,nameIdx:nm,deptIdx:d};break}
+ const file=input.files&&input.files[0];
+ if(!file)return;
+ const reader=new FileReader();
+ reader.onload=ev=>{
+  try{
+   const wb=XLSX.read(ev.target.result,{type:'array',cellText:true,cellDates:false});
+   const normalize=v=>String(v??'').trim().toUpperCase().replace(/[^A-Z0-9]/g,'');
+   const aliases={
+    nik:['NIK','NONIK','EMPLOYEEID','IDKARYAWAN','KARYAWANID','PERSONNELNO','PERSONNELNUMBER'],
+    name:['NAME','NAMA','EMPLOYEENAME','NAMAKARYAWAN','FULLNAME'],
+    dept:['DEPT','DEPARTMENT','DEPARTEMEN','DIVISION','DIV','BAGIAN']
+   };
+   const matchHeader=(row,key)=>{
+    const vals=row.map(normalize);
+    // Exact alias matches first, to avoid matching unrelated title text.
+    for(const alias of aliases[key]){
+     const idx=vals.findIndex(v=>v===alias);
+     if(idx!==-1)return idx;
+    }
+    // Limited fallback for common header variations (e.g. DEPT. or NAME EMPLOYEE).
+    return vals.findIndex(v=>v&&aliases[key].some(a=>v.startsWith(a)||v.endsWith(a)));
+   };
+   const sheets=[];
+   for(const sheetName of wb.SheetNames){
+    const ws=wb.Sheets[sheetName];
+    const matrix=XLSX.utils.sheet_to_json(ws,{header:1,defval:'',raw:false,blankrows:true});
+    let headerIndex=-1,nikIdx=-1,nameIdx=-1,deptIdx=-1;
+    for(let i=0;i<Math.min(matrix.length,150);i++){
+     const row=matrix[i]||[];
+     const n=matchHeader(row,'nik'),nm=matchHeader(row,'name'),d=matchHeader(row,'dept');
+     if(n>=0&&nm>=0&&d>=0){headerIndex=i;nikIdx=n;nameIdx=nm;deptIdx=d;break;}
+    }
+    // Known layout fallback for TRID Employee Database: row 4, columns B-D.
+    // Only use when the header row is verified, not based on position alone.
+    if(headerIndex<0){
+     for(let i=0;i<Math.min(matrix.length,150);i++){
+      const row=(matrix[i]||[]).map(normalize);
+      if(row[1]==='NIK'&&row[2]==='NAME'&&row[3]==='DEPT'){
+       headerIndex=i;nikIdx=1;nameIdx=2;deptIdx=3;break;
+      }
+     }
+    }
+    if(headerIndex>=0)sheets.push({sheetName,matrix,headerIndex,nikIdx,nameIdx,deptIdx});
    }
-   if(found)break;
-  }
-  if(!found){alert('Header NIK, NAME/NAMA, dan DEPT/DEPARTEMEN tidak ditemukan. Sistem sudah mencari di semua sheet dan 100 baris pertama. Pastikan file Excel memiliki kolom NIK, NAME/NAMA, dan DEPT/DEPARTEMEN.');return}
-  let {sheetName,matrix,headerIndex,nikIdx,nameIdx,deptIdx}=found;let added=0,updated=0,skipped=0;
-  for(let i=headerIndex+1;i<matrix.length;i++){let row=matrix[i],nik=clean(row[nikIdx]),name=clean(row[nameIdx]),dept=clean(row[deptIdx]);if(!nik&&!name&&!dept)continue;if(!nik||!name||!dept){skipped++;continue}let ex=employees.find(e=>e.nik===nik);if(ex){Object.assign(ex,{name,dept,status:'Aktif'});updated++}else{employees.push({id:Date.now().toString()+Math.random().toString(16).slice(2),nik,name,dept,status:'Aktif'});added++}}
-  save();renderAll();alert(`Import berhasil!\nSheet: ${sheetName}\nHeader baris: ${headerIndex+1}\nData baru: ${added}\nData diperbarui: ${updated}\nData dilewati: ${skipped}`)
- }catch(err){alert('Gagal membaca Excel: '+err.message)}finally{input.value=''}};reader.readAsArrayBuffer(file)
+   if(!sheets.length){
+    alert('Header tidak ditemukan. Pastikan Excel memiliki kolom NIK, NAME/NAMA, dan DEPT/DEPARTMENT. Sistem sudah mencari sampai 150 baris pada semua sheet.');
+    return;
+   }
+   let imported=[],skipped=0;
+   const cellText=(v)=>String(v??'').trim();
+   for(const sh of sheets){
+    for(let i=sh.headerIndex+1;i<sh.matrix.length;i++){
+     const row=sh.matrix[i]||[];
+     let nik=cellText(row[sh.nikIdx]),name=cellText(row[sh.nameIdx]),dept=cellText(row[sh.deptIdx]);
+     if(!nik&&!name&&!dept)continue;
+     // Ignore repeated headers or title rows in the middle of the data.
+     if(normalize(nik)==='NIK'&&normalize(name)==='NAME')continue;
+     if(!nik||!name||!dept){skipped++;continue;}
+     imported.push({nik,name,dept,sheet:sh.sheetName});
+    }
+   }
+   if(!imported.length){
+    alert('Header ditemukan, tetapi tidak ada data karyawan valid di bawah header.');
+    return;
+   }
+   let added=0,updated=0,duplicates=0;
+   const seen=new Set();
+   imported.forEach(emp=>{
+    const key=emp.nik.trim();
+    if(seen.has(key)){duplicates++;return;}
+    seen.add(key);
+    const existing=employees.find(e=>String(e.nik).trim()===key);
+    if(existing){Object.assign(existing,{nik:key,name:emp.name,dept:emp.dept,status:'Aktif'});updated++;}
+    else employees.push({id:Date.now().toString()+Math.random().toString(16).slice(2),nik:key,name:emp.name,dept:emp.dept,status:'Aktif'}),added++;
+   });
+   save();renderAll();
+   const sheetNames=sheets.map(x=>x.sheetName).join(', ');
+   alert('IMPORT EXCEL BERHASIL!\n\nSheet: '+sheetNames+'\nHeader baris: '+sheets.map(x=>x.headerIndex+1).join(', ')+'\nTotal data valid: '+imported.length+'\nData baru: '+added+'\nData diperbarui: '+updated+'\nDuplikat NIK dilewati: '+duplicates+'\nBaris tidak lengkap dilewati: '+skipped);
+  }catch(err){console.error('Import Excel error:',err);alert('Gagal membaca Excel: '+err.message+'\nPastikan file tidak rusak dan format .xlsx/.xls/.csv.');}
+  finally{input.value='';}
+ };
+ reader.readAsArrayBuffer(file);
 }
 function exportExcel(){if(!employees.length){alert('Belum ada data untuk export.');return}let ws=XLSX.utils.json_to_sheet(employees.map(e=>({NIK:e.nik,NAME:e.name,DEPT:e.dept,STATUS:e.status||'Aktif'})));let wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Employee');XLSX.writeFile(wb,'Master_Employee.xlsx')}
 function statusBadge(s){return `<span class="badge-soft ${s==='Approved'?'approved':s==='Rejected'?'rejected':'pending'}">${s}</span>`}
