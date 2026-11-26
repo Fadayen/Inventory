@@ -1,143 +1,131 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>IT Inventory Ledger</title>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
 <style>
-:root{--navy:#10233f;--blue:#2563eb;--bg:#f4f7fb;--muted:#718096}
-body{background:var(--bg);font-family:Inter,Segoe UI,Arial,sans-serif;color:#1f2937}
-.sidebar{background:linear-gradient(180deg,#10233f,#172f52);min-height:100vh;color:#fff}
-.brand{font-weight:800;letter-spacing:.3px}
-.nav-link{color:#c8d5e6;border-radius:10px;margin:4px 0;padding:11px 13px}
-.nav-link:hover,.nav-link.active{background:#24466e;color:white}
-.card{border:0;border-radius:16px;box-shadow:0 4px 18px rgba(20,45,80,.06)}
-.stat-icon{width:44px;height:44px;border-radius:13px;display:grid;place-items:center;font-size:20px}
-.table thead th{font-size:12px;text-transform:uppercase;letter-spacing:.5px;color:#718096;background:#f8fafc;white-space:nowrap}
-.table td{vertical-align:middle}
-.badge-in{background:#dcfce7;color:#166534}.badge-out{background:#fee2e2;color:#991b1b}
-.btn-primary{background:var(--blue);border-color:var(--blue)}
-.form-control,.form-select{border-radius:10px}
-.page-title{font-weight:750}
-.small-muted{color:var(--muted)}
-@media(max-width:767px){.sidebar{min-height:auto}.nav-link{display:inline-block;margin-right:4px}.stat-card{margin-bottom:10px}}
+:root{--navy:#0b1730;--navy2:#14294a;--blue:#3b82f6;--bg:#f5f7fb;--ink:#172033;--muted:#748198}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);font-family:Inter,Segoe UI,Arial,sans-serif;color:var(--ink)}
+.sidebar{background:linear-gradient(160deg,var(--navy),var(--navy2));color:white;min-height:100vh;position:sticky;top:0}
+.brand{font-weight:800;letter-spacing:.7px}.brand-icon{width:40px;height:40px;border-radius:13px;background:#3b82f6;display:grid;place-items:center}
+.nav-link{color:#b8c7dc;border-radius:12px;padding:11px 13px;margin:4px 0;transition:all .25s}.nav-link:hover{color:white;background:rgba(255,255,255,.09);transform:translateX(3px)}.nav-link.active{color:white;background:linear-gradient(90deg,#2563eb,#3b82f6);box-shadow:0 8px 20px #2563eb30}
+main{min-height:100vh}.topbar{background:#ffffffc9;backdrop-filter:blur(12px);border-bottom:1px solid #e8edf5}
+.card{border:1px solid #edf1f7;border-radius:18px;box-shadow:0 6px 24px rgba(20,40,80,.045);transition:transform .25s,box-shadow .25s}.stat-card:hover{transform:translateY(-5px);box-shadow:0 15px 32px rgba(20,40,80,.09)}
+.stat-icon{width:46px;height:46px;border-radius:14px;display:grid;place-items:center;font-size:19px}
+.page-title{font-weight:800;letter-spacing:-.5px}.muted{color:var(--muted)}.eyebrow{font-size:12px;letter-spacing:1.2px;text-transform:uppercase;color:#8b98aa;font-weight:700}
+.table thead th{font-size:11px;letter-spacing:.7px;text-transform:uppercase;color:#8390a4;background:#f8fafc;white-space:nowrap;border-bottom:0}.table td{vertical-align:middle}.table tbody tr{transition:background .18s}.table tbody tr:hover{background:#f7faff}
+.badge-in{background:#dcfce7;color:#166534}.badge-out{background:#fee2e2;color:#991b1b}.badge-stock{background:#e8f1ff;color:#1d4ed8}
+.btn{border-radius:11px;transition:transform .18s,box-shadow .18s}.btn:hover{transform:translateY(-1px)}.btn-primary{background:#2563eb;border-color:#2563eb}
+.form-control,.form-select{border-radius:10px;padding:.62rem .8rem}.form-control:focus,.form-select:focus{border-color:#93c5fd;box-shadow:0 0 0 .2rem #3b82f620}
+.modal-content{border:0;border-radius:20px;overflow:hidden}.modal-header,.modal-footer{border-color:#eef2f7}
+.content-section{display:none}.content-section.active{display:block}.empty{padding:40px;text-align:center;color:#95a0b2}
+@media(max-width:767px){.sidebar{position:relative;min-height:auto}.sidebar .nav{flex-direction:row;overflow:auto}.sidebar .nav-link{white-space:nowrap}.sidebar .sidebar-bottom{display:none}.topbar{position:relative}.main-content{padding:1rem!important}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
 </style>
 </head>
 <body>
-<div class="container-fluid">
-<div class="row">
-<aside class="col-md-2 sidebar p-3">
-  <div class="brand fs-5 mb-4"><i class="bi bi-box-seam me-2"></i>IT INVENTORY</div>
-  <div class="small text-uppercase opacity-50 mb-2">Menu</div>
-  <nav class="nav flex-column">
-    <a class="nav-link active" href="#" data-page="dashboard"><i class="bi bi-grid me-2"></i>Dashboard</a>
-    <a class="nav-link" href="#" data-page="transactions"><i class="bi bi-arrow-left-right me-2"></i>Transaksi</a>
-    <a class="nav-link" href="#" data-page="items"><i class="bi bi-boxes me-2"></i>Master Barang</a>
-  </nav>
-  <div class="mt-5 small opacity-75">IT Inventory Ledger<br><span id="todayLabel"></span></div>
+<div class="container-fluid"><div class="row g-0">
+<aside class="col-lg-2 sidebar p-3 p-lg-4">
+<div class="d-flex align-items-center gap-2 mb-4 brand"><div class="brand-icon"><i class="bi bi-box-seam"></i></div><div>IT INVENTORY<small class="d-block fw-normal opacity-50">Management System</small></div></div>
+<div class="eyebrow text-white-50 mb-2">Workspace</div>
+<nav class="nav flex-column">
+<a href="#" class="nav-link active" data-page="dashboard"><i class="bi bi-grid-1x2-fill me-2"></i>Dashboard</a>
+<a href="#" class="nav-link" data-page="items"><i class="bi bi-boxes me-2"></i>Master Barang</a>
+<a href="#" class="nav-link" data-page="transactions"><i class="bi bi-arrow-left-right me-2"></i>Transaksi</a>
+<a href="#" class="nav-link" data-page="reports"><i class="bi bi-file-earmark-bar-graph me-2"></i>Reports</a>
+</nav>
+<div class="sidebar-bottom mt-5 pt-4 border-top border-white border-opacity-10 small text-white-50"><i class="bi bi-shield-check me-1"></i>Local Inventory Ledger<br><span id="sideDate"></span></div>
 </aside>
-<main class="col-md-10 p-3 p-md-4">
-<header class="d-flex justify-content-between align-items-center mb-4">
-  <div><div class="small-muted">Inventory Management</div><h3 class="page-title mb-0" id="pageTitle">Dashboard</h3></div>
-  <button class="btn btn-primary" onclick="openTransaction()"><i class="bi bi-plus-lg me-1"></i>Tambah Transaksi</button>
-</header>
-
-<section id="dashboardPage">
-  <div class="row g-3 mb-4">
-    <div class="col-sm-6 col-xl-3"><div class="card p-3 stat-card"><div class="d-flex justify-content-between"><div><div class="small-muted">Total Jenis Barang</div><h3 id="statItems">0</h3></div><div class="stat-icon bg-primary-subtle text-primary"><i class="bi bi-boxes"></i></div></div></div></div>
-    <div class="col-sm-6 col-xl-3"><div class="card p-3 stat-card"><div class="d-flex justify-content-between"><div><div class="small-muted">Total Stok</div><h3 id="statStock">0</h3></div><div class="stat-icon bg-success-subtle text-success"><i class="bi bi-stack"></i></div></div></div></div>
-    <div class="col-sm-6 col-xl-3"><div class="card p-3 stat-card"><div class="d-flex justify-content-between"><div><div class="small-muted">Barang Masuk</div><h3 id="statIn">0</h3></div><div class="stat-icon bg-info-subtle text-info"><i class="bi bi-box-arrow-in-down"></i></div></div></div></div>
-    <div class="col-sm-6 col-xl-3"><div class="card p-3 stat-card"><div class="d-flex justify-content-between"><div><div class="small-muted">Barang Keluar</div><h3 id="statOut">0</h3></div><div class="stat-icon bg-danger-subtle text-danger"><i class="bi bi-box-arrow-up"></i></div></div></div></div>
-  </div>
-  <div class="card p-3 mb-4"><div class="d-flex justify-content-between align-items-center mb-3"><h5 class="mb-0">Transaksi Terbaru</h5><button class="btn btn-sm btn-outline-primary" onclick="showPage('transactions')">Lihat semua</button></div><div class="table-responsive"><table class="table mb-0"><thead><tr><th>Tanggal</th><th>Barang</th><th>Jenis</th><th>Qty</th><th>From</th><th>To</th><th>Reason</th></tr></thead><tbody id="recentTable"></tbody></table></div></div>
-</section>
-
-<section id="transactionsPage" class="d-none">
-  <div class="card p-3">
-    <div class="row g-2 mb-3">
-      <div class="col-md-4"><input class="form-control" id="transactionSearch" placeholder="Cari barang, From, To, PR..." oninput="renderTransactions()"></div>
-      <div class="col-md-3"><select class="form-select" id="typeFilter" onchange="renderTransactions()"><option value="">Semua transaksi</option><option>Masuk</option><option>Keluar</option></select></div>
-      <div class="col-md-3"><input type="date" class="form-control" id="dateFilter" onchange="renderTransactions()"></div>
-      <div class="col-md-2"><button class="btn btn-outline-success w-100" onclick="exportCSV()"><i class="bi bi-file-earmark-excel me-1"></i>Export CSV</button></div>
-    </div>
-    <div class="table-responsive"><table class="table table-hover"><thead><tr><th>No</th><th>Tanggal</th><th>Barang</th><th>Jenis</th><th>Qty</th><th>From</th><th>To</th><th>Reason</th><th>No. PR</th><th>Remarks</th><th></th></tr></thead><tbody id="transactionTable"></tbody></table></div>
-  </div>
-</section>
-
-<section id="itemsPage" class="d-none">
-  <div class="card p-3">
-    <div class="d-flex justify-content-between align-items-center mb-3"><h5 class="mb-0">Master Barang</h5><button class="btn btn-primary btn-sm" onclick="openItem()"><i class="bi bi-plus-lg me-1"></i>Tambah Barang</button></div>
-    <div class="row mb-3"><div class="col-md-5"><input id="itemSearch" class="form-control" placeholder="Cari nama/kategori barang..." oninput="renderItems()"></div></div>
-    <div class="table-responsive"><table class="table table-hover"><thead><tr><th>Nama Barang</th><th>Kategori</th><th>Unit</th><th>Stok</th><th></th></tr></thead><tbody id="itemTable"></tbody></table></div>
-  </div>
-</section>
-</main>
+<main class="col-lg-10">
+<div class="topbar px-3 px-lg-4 py-3 d-flex justify-content-between align-items-center">
+<div><div class="small muted">Inventory workspace</div><div class="fw-semibold" id="topTitle">Dashboard Overview</div></div>
+<div class="d-flex gap-2 align-items-center"><span class="badge text-bg-light border d-none d-sm-inline"><i class="bi bi-circle-fill text-success me-1" style="font-size:7px"></i>Local storage active</span><button class="btn btn-primary" onclick="openTxn()"><i class="bi bi-plus-lg me-1"></i>New Transaction</button></div>
 </div>
+<div class="main-content p-3 p-lg-4">
+<section class="content-section active" id="dashboard">
+<div class="mb-4"><div class="eyebrow mb-2">Overview</div><h2 class="page-title mb-1">IT Inventory Dashboard</h2><div class="muted">Monitor inventory movements and equipment availability.</div></div>
+<div class="row g-3 mb-4">
+<div class="col-sm-6 col-xl-3"><div class="card stat-card p-3"><div class="d-flex justify-content-between"><div><div class="muted small">Total Item Types</div><h2 class="fw-bold mt-2 mb-0" id="totalItems">0</h2><small class="muted">Registered equipment</small></div><div class="stat-icon bg-primary-subtle text-primary"><i class="bi bi-boxes"></i></div></div></div></div>
+<div class="col-sm-6 col-xl-3"><div class="card stat-card p-3"><div class="d-flex justify-content-between"><div><div class="muted small">Current Stock</div><h2 class="fw-bold mt-2 mb-0" id="totalStock">0</h2><small class="muted">Units available</small></div><div class="stat-icon bg-success-subtle text-success"><i class="bi bi-stack"></i></div></div></div></div>
+<div class="col-sm-6 col-xl-3"><div class="card stat-card p-3"><div class="d-flex justify-content-between"><div><div class="muted small">Stock In This Month</div><h2 class="fw-bold mt-2 mb-0" id="monthlyIn">0</h2><small class="text-success">Incoming items</small></div><div class="stat-icon bg-info-subtle text-info"><i class="bi bi-box-arrow-in-down"></i></div></div></div></div>
+<div class="col-sm-6 col-xl-3"><div class="card stat-card p-3"><div class="d-flex justify-content-between"><div><div class="muted small">Stock Out This Month</div><h2 class="fw-bold mt-2 mb-0" id="monthlyOut">0</h2><small class="text-danger">Issued / transferred</small></div><div class="stat-icon bg-danger-subtle text-danger"><i class="bi bi-box-arrow-up"></i></div></div></div></div>
 </div>
+<div class="row g-3">
+<div class="col-xl-8"><div class="card p-3 p-lg-4"><div class="d-flex justify-content-between align-items-center mb-3"><div><h5 class="fw-bold mb-1">Recent Transactions</h5><small class="muted">Latest inventory movements</small></div><button class="btn btn-sm btn-outline-primary" onclick="navigate('transactions')">View all</button></div><div class="table-responsive"><table class="table mb-0"><thead><tr><th>Date</th><th>Device</th><th>Type</th><th>Qty</th><th>From / To</th></tr></thead><tbody id="recentRows"></tbody></table></div></div></div>
+<div class="col-xl-4"><div class="card p-3 p-lg-4 h-100"><h5 class="fw-bold mb-1">Stock Overview</h5><small class="muted mb-3">Inventory balance by item</small><div id="stockOverview"></div></div></div>
+</div>
+</section>
+<section class="content-section" id="items">
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2"><div><div class="eyebrow">Inventory</div><h2 class="page-title mb-1">Master Barang</h2><div class="muted">Manage IT equipment and inventory items.</div></div><button class="btn btn-primary" onclick="openItem()"><i class="bi bi-plus-lg me-1"></i>Add Item</button></div>
+<div class="card p-3"><div class="row g-2 mb-3"><div class="col-md-5"><input id="itemQuery" class="form-control" placeholder="Search item, category..." oninput="renderItems()"></div><div class="col-md-3"><select id="catFilter" class="form-select" onchange="renderItems()"><option value="">All categories</option></select></div></div><div class="table-responsive"><table class="table table-hover"><thead><tr><th>Item Code</th><th>Device Name</th><th>Category</th><th>Brand / Model</th><th>Serial Number</th><th>Stock</th><th>Location</th><th></th></tr></thead><tbody id="itemRows"></tbody></table></div></div>
+</section>
+<section class="content-section" id="transactions">
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2"><div><div class="eyebrow">Movements</div><h2 class="page-title mb-1">Transaction History</h2><div class="muted">Track all incoming and outgoing equipment.</div></div><button class="btn btn-primary" onclick="openTxn()"><i class="bi bi-plus-lg me-1"></i>Add Transaction</button></div>
+<div class="card p-3"><div class="row g-2 mb-3"><div class="col-lg-4"><input id="txnQuery" class="form-control" placeholder="Search item, user, PR..." oninput="renderTransactions()"></div><div class="col-sm-4 col-lg-2"><select id="txnType" class="form-select" onchange="renderTransactions()"><option value="">All types</option><option>Masuk</option><option>Keluar</option></select></div><div class="col-sm-4 col-lg-2"><input type="date" id="txnDate" class="form-control" onchange="renderTransactions()"></div><div class="col-sm-4 col-lg-2"><button class="btn btn-outline-success w-100" onclick="exportCSV()"><i class="bi bi-file-earmark-excel me-1"></i>Export CSV</button></div><div class="col-sm-4 col-lg-2"><button class="btn btn-outline-secondary w-100" onclick="clearFilters()">Reset</button></div></div><div class="table-responsive"><table class="table table-hover"><thead><tr><th>Date</th><th>Device</th><th>Type</th><th>Qty</th><th>From</th><th>To</th><th>Reason</th><th>PR Number</th><th>Remarks</th><th></th></tr></thead><tbody id="txnRows"></tbody></table></div></div>
+</section>
+<section class="content-section" id="reports">
+<div class="mb-4"><div class="eyebrow">Analytics</div><h2 class="page-title mb-1">Inventory Reports</h2><div class="muted">Export inventory and transaction records for reporting.</div></div>
+<div class="row g-3"><div class="col-md-6 col-xl-4"><div class="card p-4"><div class="stat-icon bg-primary-subtle text-primary mb-3"><i class="bi bi-file-earmark-spreadsheet"></i></div><h5 class="fw-bold">Transaction Report</h5><p class="muted">Export all stock-in and stock-out history.</p><button class="btn btn-outline-primary" onclick="exportCSV()">Export CSV</button></div></div><div class="col-md-6 col-xl-4"><div class="card p-4"><div class="stat-icon bg-success-subtle text-success mb-3"><i class="bi bi-boxes"></i></div><h5 class="fw-bold">Inventory Stock Report</h5><p class="muted">Export current stock balance for each item.</p><button class="btn btn-outline-success" onclick="exportStock()">Export Stock</button></div></div><div class="col-md-6 col-xl-4"><div class="card p-4"><div class="stat-icon bg-warning-subtle text-warning mb-3"><i class="bi bi-database"></i></div><h5 class="fw-bold">Backup Data</h5><p class="muted">Download a JSON backup of your browser data.</p><button class="btn btn-outline-dark" onclick="backupJSON()">Backup JSON</button></div></div></div>
+</section>
+</div>
+</main></div></div>
 
-<!-- Transaction Modal -->
-<div class="modal fade" id="transactionModal" tabindex="-1"><div class="modal-dialog modal-lg modal-dialog-centered"><div class="modal-content border-0 rounded-4">
-<div class="modal-header"><h5 class="modal-title">Tambah Transaksi Barang</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
-<form id="transactionForm"><div class="modal-body"><div class="row g-3">
-<div class="col-md-4"><label class="form-label">Tanggal *</label><input type="date" name="date" class="form-control" required></div>
-<div class="col-md-4"><label class="form-label">Jenis Transaksi *</label><select name="type" class="form-select" required><option value="Masuk">Barang Masuk</option><option value="Keluar">Barang Keluar</option></select></div>
-<div class="col-md-4"><label class="form-label">Qty *</label><input type="number" name="qty" min="1" class="form-control" required></div>
-<div class="col-md-6"><label class="form-label">Nama Barang *</label><input name="item" class="form-control" list="itemList" placeholder="Pilih atau ketik barang" required><datalist id="itemList"></datalist></div>
-<div class="col-md-3"><label class="form-label">From</label><input name="from" class="form-control" placeholder="Supplier / lokasi asal"></div>
-<div class="col-md-3"><label class="form-label">To</label><input name="to" class="form-control" placeholder="User / lokasi tujuan"></div>
-<div class="col-md-6"><label class="form-label">Reason / Keperluan</label><input name="reason" class="form-control" placeholder="Contoh: Penggantian PC, peminjaman"></div>
-<div class="col-md-6"><label class="form-label">Nomor PR</label><input name="pr" class="form-control" placeholder="PR 00000000"></div>
-<div class="col-12"><label class="form-label">Remarks</label><textarea name="remarks" class="form-control" rows="2"></textarea></div>
-</div></div><div class="modal-footer"><button type="button" class="btn btn-light" data-bs-dismiss="modal">Batal</button><button class="btn btn-primary" type="submit">Simpan Transaksi</button></div></form>
-</div></div></div>
-
-<!-- Item Modal -->
-<div class="modal fade" id="itemModal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content border-0 rounded-4">
-<div class="modal-header"><h5 class="modal-title">Tambah Master Barang</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
-<form id="itemForm"><div class="modal-body"><div class="mb-3"><label class="form-label">Nama Barang *</label><input name="name" class="form-control" required></div><div class="mb-3"><label class="form-label">Kategori</label><input name="category" class="form-control" placeholder="PC, Laptop, Peripheral, Network"></div><div class="mb-3"><label class="form-label">Unit</label><input name="unit" class="form-control" value="pcs"></div></div><div class="modal-footer"><button class="btn btn-light" data-bs-dismiss="modal" type="button">Batal</button><button class="btn btn-primary" type="submit">Simpan Barang</button></div></form>
-</div></div></div>
-
+<!-- transaction modal -->
+<div class="modal fade" id="txnModal" tabindex="-1"><div class="modal-dialog modal-lg modal-dialog-centered"><div class="modal-content"><form id="txnForm"><div class="modal-header p-4"><div><div class="eyebrow">Inventory movement</div><h5 class="modal-title fw-bold">Add Transaction</h5></div><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body px-4"><div class="row g-3">
+<div class="col-md-4"><label class="form-label">Date *</label><input type="date" name="date" class="form-control" required></div><div class="col-md-4"><label class="form-label">Transaction Type *</label><select name="type" class="form-select"><option>Masuk</option><option>Keluar</option></select></div><div class="col-md-4"><label class="form-label">Quantity *</label><input type="number" name="qty" min="1" class="form-control" required></div>
+<div class="col-md-6"><label class="form-label">Device Name *</label><input name="item" class="form-control" list="itemOptions" placeholder="Select or type device" required><datalist id="itemOptions"></datalist></div><div class="col-md-3"><label class="form-label">From</label><input name="from" class="form-control" placeholder="Supplier / Location"></div><div class="col-md-3"><label class="form-label">To</label><input name="to" class="form-control" placeholder="Employee / Location"></div>
+<div class="col-md-6"><label class="form-label">Reason</label><input name="reason" class="form-control" placeholder="Purpose of transaction"></div><div class="col-md-6"><label class="form-label">Purchase Request (PR)</label><input name="pr" class="form-control" placeholder="PR number"></div><div class="col-12"><label class="form-label">Remarks</label><textarea name="remarks" class="form-control" rows="2" placeholder="Additional notes"></textarea></div></div></div><div class="modal-footer p-3"><button class="btn btn-light" type="button" data-bs-dismiss="modal">Cancel</button><button class="btn btn-primary" type="submit"><i class="bi bi-check2 me-1"></i>Save Transaction</button></div></form></div></div></div>
+<!-- item modal -->
+<div class="modal fade" id="itemModal" tabindex="-1"><div class="modal-dialog modal-lg modal-dialog-centered"><div class="modal-content"><form id="itemForm"><div class="modal-header p-4"><div><div class="eyebrow">Item setup</div><h5 class="modal-title fw-bold">Add Master Item</h5></div><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body px-4"><div class="row g-3">
+<div class="col-md-4"><label class="form-label">Item Code</label><input name="code" class="form-control" placeholder="IT-001"></div><div class="col-md-8"><label class="form-label">Device Name *</label><input name="name" class="form-control" required placeholder="Laptop, Monitor, Switch..."></div><div class="col-md-4"><label class="form-label">Category</label><input name="category" class="form-control" placeholder="Computer / Network"></div><div class="col-md-4"><label class="form-label">Brand</label><input name="brand" class="form-control"></div><div class="col-md-4"><label class="form-label">Model</label><input name="model" class="form-control"></div><div class="col-md-6"><label class="form-label">Serial Number</label><input name="serial" class="form-control"></div><div class="col-md-3"><label class="form-label">Unit</label><input name="unit" class="form-control" value="pcs"></div><div class="col-md-3"><label class="form-label">Location</label><input name="location" class="form-control"></div><div class="col-12"><label class="form-label">Description</label><textarea name="description" class="form-control" rows="2"></textarea></div></div></div><div class="modal-footer p-3"><button class="btn btn-light" type="button" data-bs-dismiss="modal">Cancel</button><button class="btn btn-primary" type="submit">Save Item</button></div></form></div></div></div>
+<div class="toast-container position-fixed bottom-0 end-0 p-3"><div class="toast" id="appToast"><div class="toast-header"><i class="bi bi-check-circle-fill text-success me-2"></i><strong class="me-auto">IT Inventory</strong><button class="btn-close" data-bs-dismiss="toast"></button></div><div class="toast-body" id="toastMessage">Saved successfully.</div></div></div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.1.20/dist/lenis.min.js"></script>
 <script>
-const KEY='it_inventory_ledger_v1';
-let db=JSON.parse(localStorage.getItem(KEY)||'{"items":[],"transactions":[]}');
-const save=()=>localStorage.setItem(KEY,JSON.stringify(db));
-const today=new Date().toISOString().slice(0,10);
-document.getElementById('todayLabel').textContent=new Date().toLocaleDateString('id-ID',{day:'2-digit',month:'long',year:'numeric'});
-function showPage(p){['dashboard','transactions','items'].forEach(x=>document.getElementById(x+'Page').classList.toggle('d-none',x!==p));document.querySelectorAll('[data-page]').forEach(a=>a.classList.toggle('active',a.dataset.page===p));document.getElementById('pageTitle').textContent={dashboard:'Dashboard',transactions:'Riwayat Transaksi',items:'Master Barang'}[p];renderAll();}
-document.querySelectorAll('[data-page]').forEach(a=>a.onclick=e=>{e.preventDefault();showPage(a.dataset.page)});
-function stockFor(name){return db.transactions.filter(t=>t.item.toLowerCase()===name.toLowerCase()).reduce((s,t)=>s+(t.type==='Masuk'?Number(t.qty):-Number(t.qty)),0)}
-function renderAll(){renderDashboard();renderTransactions();renderItems();fillItemList()}
-function renderDashboard(){
-document.getElementById('statItems').textContent=db.items.length;
-document.getElementById('statStock').textContent=db.items.reduce((s,i)=>s+stockFor(i.name),0);
-document.getElementById('statIn').textContent=db.transactions.filter(t=>t.type==='Masuk').reduce((s,t)=>s+Number(t.qty),0);
-document.getElementById('statOut').textContent=db.transactions.filter(t=>t.type==='Keluar').reduce((s,t)=>s+Number(t.qty),0);
-let rows=[...db.transactions].sort((a,b)=>b.date.localeCompare(a.date)).slice(0,8);
-document.getElementById('recentTable').innerHTML=rows.length?rows.map(t=>`<tr><td>${esc(t.date)}</td><td><b>${esc(t.item)}</b></td><td><span class="badge ${t.type==='Masuk'?'badge-in':'badge-out'}">${t.type}</span></td><td>${t.qty}</td><td>${esc(t.from||'-')}</td><td>${esc(t.to||'-')}</td><td>${esc(t.reason||'-')}</td></tr>`).join(''):'<tr><td colspan="7" class="text-center text-muted py-4">Belum ada transaksi.</td></tr>';
-}
-function renderTransactions(){
-let q=(document.getElementById('transactionSearch')?.value||'').toLowerCase(),type=document.getElementById('typeFilter')?.value||'',date=document.getElementById('dateFilter')?.value||'';
-let rows=[...db.transactions].sort((a,b)=>b.date.localeCompare(a.date)).filter(t=>(!type||t.type===type)&&(!date||t.date===date)&&[t.item,t.from,t.to,t.reason,t.pr].join(' ').toLowerCase().includes(q));
-document.getElementById('transactionTable').innerHTML=rows.length?rows.map((t,i)=>`<tr><td>${i+1}</td><td>${esc(t.date)}</td><td><b>${esc(t.item)}</b></td><td><span class="badge ${t.type==='Masuk'?'badge-in':'badge-out'}">${t.type}</span></td><td>${t.qty}</td><td>${esc(t.from||'-')}</td><td>${esc(t.to||'-')}</td><td>${esc(t.reason||'-')}</td><td>${esc(t.pr||'-')}</td><td>${esc(t.remarks||'-')}</td><td><button class="btn btn-sm btn-outline-danger" onclick="deleteTransaction('${t.id}')" title="Hapus"><i class="bi bi-trash"></i></button></td></tr>`).join(''):'<tr><td colspan="11" class="text-center text-muted py-4">Transaksi tidak ditemukan.</td></tr>';
+const STORE='it_inventory_github_v2';let db=JSON.parse(localStorage.getItem(STORE)||'{"items":[],"transactions":[]}');
+const today=new Date().toISOString().slice(0,10);document.getElementById('sideDate').textContent=new Date().toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'});
+function persist(){localStorage.setItem(STORE,JSON.stringify(db))}
+function notify(msg){document.getElementById('toastMessage').textContent=msg;bootstrap.Toast.getOrCreateInstance(document.getElementById('appToast')).show()}
+function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function stock(name){return db.transactions.filter(t=>t.item.toLowerCase()===name.toLowerCase()).reduce((a,t)=>a+(t.type==='Masuk'?+t.qty:-t.qty),0)}
+function nav(page){document.querySelectorAll('.content-section').forEach(s=>s.classList.toggle('active',s.id===page));document.querySelectorAll('[data-page]').forEach(a=>a.classList.toggle('active',a.dataset.page===page));let labels={dashboard:'Dashboard Overview',items:'Master Barang',transactions:'Transaction History',reports:'Inventory Reports'};document.getElementById('topTitle').textContent=labels[page]||page;animatePage()}
+document.querySelectorAll('[data-page]').forEach(a=>a.onclick=e=>{e.preventDefault();nav(a.dataset.page)});
+function animatePage(){if(!window.gsap||matchMedia('(prefers-reduced-motion: reduce)').matches)return;gsap.fromTo('.content-section.active .card,.content-section.active h2,.content-section.active .eyebrow',{y:14,opacity:0},{y:0,opacity:1,duration:.45,stagger:.05,ease:'power2.out'})}
+function render(){
+let month=today.slice(0,7),ins=db.transactions.filter(t=>t.type==='Masuk'&&t.date.startsWith(month)).reduce((a,t)=>a+ +t.qty,0),outs=db.transactions.filter(t=>t.type==='Keluar'&&t.date.startsWith(month)).reduce((a,t)=>a+ +t.qty,0);
+document.getElementById('totalItems').textContent=db.items.length;document.getElementById('totalStock').textContent=db.items.reduce((a,i)=>a+stock(i.name),0);document.getElementById('monthlyIn').textContent=ins;document.getElementById('monthlyOut').textContent=outs;
+let recent=[...db.transactions].sort((a,b)=>b.date.localeCompare(a.date)).slice(0,6);
+document.getElementById('recentRows').innerHTML=recent.length?recent.map(t=>`<tr><td>${esc(t.date)}</td><td class="fw-semibold">${esc(t.item)}</td><td><span class="badge ${t.type==='Masuk'?'badge-in':'badge-out'}">${t.type}</span></td><td>${t.qty}</td><td>${esc(t.from||'—')} <i class="bi bi-arrow-right mx-1 muted"></i> ${esc(t.to||'—')}</td></tr>`).join(''):'<tr><td colspan="5" class="empty">No transactions recorded yet.</td></tr>';
+let overview=db.items.slice(0,8);document.getElementById('stockOverview').innerHTML=overview.length?overview.map(i=>`<div class="d-flex align-items-center justify-content-between py-2 border-bottom"><div><div class="fw-semibold">${esc(i.name)}</div><small class="muted">${esc(i.category||'Uncategorized')}</small></div><span class="badge badge-stock">${stock(i.name)} ${esc(i.unit||'pcs')}</span></div>`).join(''):'<div class="empty">Add items to see stock overview.</div>';
+renderItems();renderTxns();fillOptions();if(window.gsap&&!matchMedia('(prefers-reduced-motion: reduce)').matches){gsap.fromTo('.stat-card',{y:18,opacity:0},{y:0,opacity:1,duration:.5,stagger:.08,ease:'power2.out'})}
 }
 function renderItems(){
-let q=(document.getElementById('itemSearch')?.value||'').toLowerCase();
-let rows=db.items.filter(i=>(i.name+' '+i.category).toLowerCase().includes(q));
-document.getElementById('itemTable').innerHTML=rows.length?rows.map(i=>`<tr><td><b>${esc(i.name)}</b></td><td>${esc(i.category||'-')}</td><td>${esc(i.unit||'pcs')}</td><td><span class="badge ${stockFor(i.name)<0?'bg-danger':'bg-primary-subtle text-primary'}">${stockFor(i.name)}</span></td><td><button class="btn btn-sm btn-outline-danger" onclick="deleteItem('${i.id}')"><i class="bi bi-trash"></i></button></td></tr>`).join(''):'<tr><td colspan="5" class="text-center text-muted py-4">Master barang masih kosong.</td></tr>';
+let q=(document.getElementById('itemQuery')?.value||'').toLowerCase(),cat=document.getElementById('catFilter')?.value||'',arr=db.items.filter(i=>(i.name+' '+i.category+' '+i.code+' '+i.brand+' '+i.model).toLowerCase().includes(q)&&(!cat||i.category===cat));
+let categories=[...new Set(db.items.map(i=>i.category).filter(Boolean))],sel=document.getElementById('catFilter');if(sel&&sel.options.length!==categories.length+1){let current=sel.value;sel.innerHTML='<option value="">All categories</option>'+categories.map(c=>`<option>${esc(c)}</option>`).join('');sel.value=current}
+document.getElementById('itemRows').innerHTML=arr.length?arr.map(i=>`<tr><td><span class="muted">${esc(i.code||'—')}</span></td><td class="fw-semibold">${esc(i.name)}</td><td>${esc(i.category||'—')}</td><td>${esc([i.brand,i.model].filter(Boolean).join(' ')||'—')}</td><td>${esc(i.serial||'—')}</td><td><span class="badge badge-stock">${stock(i.name)} ${esc(i.unit||'pcs')}</span></td><td>${esc(i.location||'—')}</td><td><button class="btn btn-sm btn-outline-danger" onclick="removeItem('${i.id}')"><i class="bi bi-trash"></i></button></td></tr>`).join(''):'<tr><td colspan="8" class="empty">No items found.</td></tr>'
 }
-function fillItemList(){document.getElementById('itemList').innerHTML=db.items.map(i=>`<option value="${esc(i.name)}">`).join('')}
-function openTransaction(){let f=document.getElementById('transactionForm');f.reset();f.elements.date.value=today;new bootstrap.Modal(document.getElementById('transactionModal')).show()}
-function openItem(){document.getElementById('itemForm').reset();new bootstrap.Modal(document.getElementById('itemModal')).show()}
-document.getElementById('transactionForm').onsubmit=e=>{e.preventDefault();let f=e.target,d=Object.fromEntries(new FormData(f));if(d.type==='Keluar'&&stockFor(d.item)<Number(d.qty)){if(!confirm('Stok saat ini tidak mencukupi. Tetap simpan transaksi?'))return;}db.transactions.push({...d,id:crypto.randomUUID()});if(!db.items.some(i=>i.name.toLowerCase()===d.item.toLowerCase()))db.items.push({id:crypto.randomUUID(),name:d.item,category:'',unit:'pcs'});save();bootstrap.Modal.getInstance(document.getElementById('transactionModal')).hide();renderAll();};
-document.getElementById('itemForm').onsubmit=e=>{e.preventDefault();let d=Object.fromEntries(new FormData(e.target));if(db.items.some(i=>i.name.toLowerCase()===d.name.toLowerCase()))return alert('Barang tersebut sudah ada di master.');db.items.push({...d,id:crypto.randomUUID()});save();bootstrap.Modal.getInstance(document.getElementById('itemModal')).hide();renderAll();};
-function deleteTransaction(id){if(confirm('Hapus transaksi ini? Stok akan ikut diperbarui.')){db.transactions=db.transactions.filter(t=>t.id!==id);save();renderAll()}}
-function deleteItem(id){let item=db.items.find(i=>i.id===id);if(db.transactions.some(t=>t.item.toLowerCase()===item.name.toLowerCase()))return alert('Barang memiliki riwayat transaksi. Tidak dapat dihapus.');if(confirm('Hapus barang dari master?')){db.items=db.items.filter(i=>i.id!==id);save();renderAll()}}
-function exportCSV(){let data=[['No','Date','Device Name','Type','Qty','From','To','Reason','Nomer PR','Remarks'],...db.transactions.map((t,i)=>[i+1,t.date,t.item,t.type,t.qty,t.from,t.to,t.reason,t.pr,t.remarks])];let csv=data.map(r=>r.map(v=>'"'+String(v??'').replaceAll('"','""')+'"').join(',')).join('\\r\\n');let blob=new Blob(['\\ufeff'+csv],{type:'text/csv;charset=utf-8'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='IT_Inventory_Transactions.csv';a.click();URL.revokeObjectURL(a.href)}
-function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
-renderAll();
+function renderTxns(){
+let q=(document.getElementById('txnQuery')?.value||'').toLowerCase(),type=document.getElementById('txnType')?.value||'',date=document.getElementById('txnDate')?.value||'',arr=[...db.transactions].sort((a,b)=>b.date.localeCompare(a.date)).filter(t=>(!type||t.type===type)&&(!date||t.date===date)&&Object.values(t).join(' ').toLowerCase().includes(q));
+document.getElementById('txnRows').innerHTML=arr.length?arr.map(t=>`<tr><td>${esc(t.date)}</td><td class="fw-semibold">${esc(t.item)}</td><td><span class="badge ${t.type==='Masuk'?'badge-in':'badge-out'}">${t.type}</span></td><td>${t.qty}</td><td>${esc(t.from||'—')}</td><td>${esc(t.to||'—')}</td><td>${esc(t.reason||'—')}</td><td>${esc(t.pr||'—')}</td><td>${esc(t.remarks||'—')}</td><td><button class="btn btn-sm btn-outline-danger" onclick="deleteTxn('${t.id}')"><i class="bi bi-trash"></i></button></td></tr>`).join(''):'<tr><td colspan="10" class="empty">No transactions found.</td></tr>'
+}
+function fillOptions(){document.getElementById('itemOptions').innerHTML=db.items.map(i=>`<option value="${esc(i.name)}">`).join('')}
+function openTxn(){let f=document.getElementById('txnForm');f.reset();f.elements.date.value=today;bootstrap.Modal.getOrCreateInstance(document.getElementById('txnModal')).show()}
+function openItem(){document.getElementById('itemForm').reset();bootstrap.Modal.getOrCreateInstance(document.getElementById('itemModal')).show()}
+document.getElementById('txnForm').onsubmit=e=>{e.preventDefault();let d=Object.fromEntries(new FormData(e.target));if(d.type==='Keluar'&&stock(d.item)<+d.qty&&!confirm('Current stock is insufficient. Save this transaction anyway?'))return;db.transactions.push({...d,id:crypto.randomUUID()});if(!db.items.some(i=>i.name.toLowerCase()===d.item.toLowerCase()))db.items.push({id:crypto.randomUUID(),name:d.item,category:'Uncategorized',unit:'pcs'});persist();bootstrap.Modal.getInstance(document.getElementById('txnModal')).hide();render();notify('Transaction saved successfully.')};
+document.getElementById('itemForm').onsubmit=e=>{e.preventDefault();let d=Object.fromEntries(new FormData(e.target));if(db.items.some(i=>i.name.toLowerCase()===d.name.toLowerCase()))return alert('Item already exists.');db.items.push({...d,id:crypto.randomUUID()});persist();bootstrap.Modal.getInstance(document.getElementById('itemModal')).hide();render();notify('Item added successfully.')};
+function deleteTxn(id){if(confirm('Delete this transaction? Stock balance will be recalculated.')){db.transactions=db.transactions.filter(t=>t.id!==id);persist();render();notify('Transaction deleted.')}}
+function removeItem(id){let i=db.items.find(x=>x.id===id);if(db.transactions.some(t=>t.item.toLowerCase()===i.name.toLowerCase()))return alert('Item has transaction history and cannot be deleted.');if(confirm('Delete item?')){db.items=db.items.filter(x=>x.id!==id);persist();render()}}
+function clearFilters(){document.getElementById('txnQuery').value='';document.getElementById('txnType').value='';document.getElementById('txnDate').value='';renderTxns()}
+function download(filename,content,mime){let blob=new Blob([content],{type:mime}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=filename;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500)}
+function exportCSV(){let rows=[['No','Date','Device Name','Type','Qty','From','To','Reason','Nomer PR','Remarks'],...db.transactions.map((t,i)=>[i+1,t.date,t.item,t.type,t.qty,t.from,t.to,t.reason,t.pr,t.remarks])];download('IT_Inventory_Transactions.csv','\\ufeff'+rows.map(r=>r.map(v=>'"'+String(v??'').replaceAll('"','""')+'"').join(',')).join('\\r\\n'),'text/csv;charset=utf-8')}
+function exportStock(){let rows=[['Item Code','Device Name','Category','Brand','Model','Serial Number','Stock','Unit','Location'],...db.items.map(i=>[i.code,i.name,i.category,i.brand,i.model,i.serial,stock(i.name),i.unit,i.location])];download('IT_Inventory_Stock.csv','\\ufeff'+rows.map(r=>r.map(v=>'"'+String(v??'').replaceAll('"','""')+'"').join(',')).join('\\r\\n'),'text/csv;charset=utf-8')}
+function backupJSON(){download('IT_Inventory_Backup.json',JSON.stringify(db,null,2),'application/json');notify('Backup downloaded.')}
+render();
+if(window.Lenis&&!matchMedia('(prefers-reduced-motion: reduce)').matches){const lenis=new Lenis({duration:1.05,smoothWheel:true});function raf(time){lenis.raf(time);requestAnimationFrame(raf)}requestAnimationFrame(raf)}
+if(window.gsap&&!matchMedia('(prefers-reduced-motion: reduce)').matches){gsap.registerPlugin(ScrollTrigger);gsap.from('.brand',{opacity:0,x:-12,duration:.5});gsap.from('.sidebar .nav-link',{opacity:0,x:-10,duration:.4,stagger:.06,delay:.1});gsap.from('.topbar',{opacity:0,y:-8,duration:.45});}
 </script>
-</body>
-</html>
+</body></html>
