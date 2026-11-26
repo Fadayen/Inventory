@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>IT Inventory Ledger</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+<style>
+:root{--navy:#10233f;--blue:#2563eb;--bg:#f4f7fb;--muted:#718096}
+body{background:var(--bg);font-family:Inter,Segoe UI,Arial,sans-serif;color:#1f2937}
+.sidebar{background:linear-gradient(180deg,#10233f,#172f52);min-height:100vh;color:#fff}
+.brand{font-weight:800;letter-spacing:.3px}
+.nav-link{color:#c8d5e6;border-radius:10px;margin:4px 0;padding:11px 13px}
+.nav-link:hover,.nav-link.active{background:#24466e;color:white}
+.card{border:0;border-radius:16px;box-shadow:0 4px 18px rgba(20,45,80,.06)}
+.stat-icon{width:44px;height:44px;border-radius:13px;display:grid;place-items:center;font-size:20px}
+.table thead th{font-size:12px;text-transform:uppercase;letter-spacing:.5px;color:#718096;background:#f8fafc;white-space:nowrap}
+.table td{vertical-align:middle}
+.badge-in{background:#dcfce7;color:#166534}.badge-out{background:#fee2e2;color:#991b1b}
+.btn-primary{background:var(--blue);border-color:var(--blue)}
+.form-control,.form-select{border-radius:10px}
+.page-title{font-weight:750}
+.small-muted{color:var(--muted)}
+@media(max-width:767px){.sidebar{min-height:auto}.nav-link{display:inline-block;margin-right:4px}.stat-card{margin-bottom:10px}}
+</style>
+</head>
+<body>
+<div class="container-fluid">
+<div class="row">
+<aside class="col-md-2 sidebar p-3">
+  <div class="brand fs-5 mb-4"><i class="bi bi-box-seam me-2"></i>IT INVENTORY</div>
+  <div class="small text-uppercase opacity-50 mb-2">Menu</div>
+  <nav class="nav flex-column">
+    <a class="nav-link active" href="#" data-page="dashboard"><i class="bi bi-grid me-2"></i>Dashboard</a>
+    <a class="nav-link" href="#" data-page="transactions"><i class="bi bi-arrow-left-right me-2"></i>Transaksi</a>
+    <a class="nav-link" href="#" data-page="items"><i class="bi bi-boxes me-2"></i>Master Barang</a>
+  </nav>
+  <div class="mt-5 small opacity-75">IT Inventory Ledger<br><span id="todayLabel"></span></div>
+</aside>
+<main class="col-md-10 p-3 p-md-4">
+<header class="d-flex justify-content-between align-items-center mb-4">
+  <div><div class="small-muted">Inventory Management</div><h3 class="page-title mb-0" id="pageTitle">Dashboard</h3></div>
+  <button class="btn btn-primary" onclick="openTransaction()"><i class="bi bi-plus-lg me-1"></i>Tambah Transaksi</button>
+</header>
+
+<section id="dashboardPage">
+  <div class="row g-3 mb-4">
+    <div class="col-sm-6 col-xl-3"><div class="card p-3 stat-card"><div class="d-flex justify-content-between"><div><div class="small-muted">Total Jenis Barang</div><h3 id="statItems">0</h3></div><div class="stat-icon bg-primary-subtle text-primary"><i class="bi bi-boxes"></i></div></div></div></div>
+    <div class="col-sm-6 col-xl-3"><div class="card p-3 stat-card"><div class="d-flex justify-content-between"><div><div class="small-muted">Total Stok</div><h3 id="statStock">0</h3></div><div class="stat-icon bg-success-subtle text-success"><i class="bi bi-stack"></i></div></div></div></div>
+    <div class="col-sm-6 col-xl-3"><div class="card p-3 stat-card"><div class="d-flex justify-content-between"><div><div class="small-muted">Barang Masuk</div><h3 id="statIn">0</h3></div><div class="stat-icon bg-info-subtle text-info"><i class="bi bi-box-arrow-in-down"></i></div></div></div></div>
+    <div class="col-sm-6 col-xl-3"><div class="card p-3 stat-card"><div class="d-flex justify-content-between"><div><div class="small-muted">Barang Keluar</div><h3 id="statOut">0</h3></div><div class="stat-icon bg-danger-subtle text-danger"><i class="bi bi-box-arrow-up"></i></div></div></div></div>
+  </div>
+  <div class="card p-3 mb-4"><div class="d-flex justify-content-between align-items-center mb-3"><h5 class="mb-0">Transaksi Terbaru</h5><button class="btn btn-sm btn-outline-primary" onclick="showPage('transactions')">Lihat semua</button></div><div class="table-responsive"><table class="table mb-0"><thead><tr><th>Tanggal</th><th>Barang</th><th>Jenis</th><th>Qty</th><th>From</th><th>To</th><th>Reason</th></tr></thead><tbody id="recentTable"></tbody></table></div></div>
+</section>
+
+<section id="transactionsPage" class="d-none">
+  <div class="card p-3">
+    <div class="row g-2 mb-3">
+      <div class="col-md-4"><input class="form-control" id="transactionSearch" placeholder="Cari barang, From, To, PR..." oninput="renderTransactions()"></div>
+      <div class="col-md-3"><select class="form-select" id="typeFilter" onchange="renderTransactions()"><option value="">Semua transaksi</option><option>Masuk</option><option>Keluar</option></select></div>
+      <div class="col-md-3"><input type="date" class="form-control" id="dateFilter" onchange="renderTransactions()"></div>
+      <div class="col-md-2"><button class="btn btn-outline-success w-100" onclick="exportCSV()"><i class="bi bi-file-earmark-excel me-1"></i>Export CSV</button></div>
+    </div>
+    <div class="table-responsive"><table class="table table-hover"><thead><tr><th>No</th><th>Tanggal</th><th>Barang</th><th>Jenis</th><th>Qty</th><th>From</th><th>To</th><th>Reason</th><th>No. PR</th><th>Remarks</th><th></th></tr></thead><tbody id="transactionTable"></tbody></table></div>
+  </div>
+</section>
+
+<section id="itemsPage" class="d-none">
+  <div class="card p-3">
+    <div class="d-flex justify-content-between align-items-center mb-3"><h5 class="mb-0">Master Barang</h5><button class="btn btn-primary btn-sm" onclick="openItem()"><i class="bi bi-plus-lg me-1"></i>Tambah Barang</button></div>
+    <div class="row mb-3"><div class="col-md-5"><input id="itemSearch" class="form-control" placeholder="Cari nama/kategori barang..." oninput="renderItems()"></div></div>
+    <div class="table-responsive"><table class="table table-hover"><thead><tr><th>Nama Barang</th><th>Kategori</th><th>Unit</th><th>Stok</th><th></th></tr></thead><tbody id="itemTable"></tbody></table></div>
+  </div>
+</section>
+</main>
+</div>
+</div>
+
+<!-- Transaction Modal -->
+<div class="modal fade" id="transactionModal" tabindex="-1"><div class="modal-dialog modal-lg modal-dialog-centered"><div class="modal-content border-0 rounded-4">
+<div class="modal-header"><h5 class="modal-title">Tambah Transaksi Barang</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
+<form id="transactionForm"><div class="modal-body"><div class="row g-3">
+<div class="col-md-4"><label class="form-label">Tanggal *</label><input type="date" name="date" class="form-control" required></div>
+<div class="col-md-4"><label class="form-label">Jenis Transaksi *</label><select name="type" class="form-select" required><option value="Masuk">Barang Masuk</option><option value="Keluar">Barang Keluar</option></select></div>
+<div class="col-md-4"><label class="form-label">Qty *</label><input type="number" name="qty" min="1" class="form-control" required></div>
+<div class="col-md-6"><label class="form-label">Nama Barang *</label><input name="item" class="form-control" list="itemList" placeholder="Pilih atau ketik barang" required><datalist id="itemList"></datalist></div>
+<div class="col-md-3"><label class="form-label">From</label><input name="from" class="form-control" placeholder="Supplier / lokasi asal"></div>
+<div class="col-md-3"><label class="form-label">To</label><input name="to" class="form-control" placeholder="User / lokasi tujuan"></div>
+<div class="col-md-6"><label class="form-label">Reason / Keperluan</label><input name="reason" class="form-control" placeholder="Contoh: Penggantian PC, peminjaman"></div>
+<div class="col-md-6"><label class="form-label">Nomor PR</label><input name="pr" class="form-control" placeholder="PR 00000000"></div>
+<div class="col-12"><label class="form-label">Remarks</label><textarea name="remarks" class="form-control" rows="2"></textarea></div>
+</div></div><div class="modal-footer"><button type="button" class="btn btn-light" data-bs-dismiss="modal">Batal</button><button class="btn btn-primary" type="submit">Simpan Transaksi</button></div></form>
+</div></div></div>
+
+<!-- Item Modal -->
+<div class="modal fade" id="itemModal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content border-0 rounded-4">
+<div class="modal-header"><h5 class="modal-title">Tambah Master Barang</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
+<form id="itemForm"><div class="modal-body"><div class="mb-3"><label class="form-label">Nama Barang *</label><input name="name" class="form-control" required></div><div class="mb-3"><label class="form-label">Kategori</label><input name="category" class="form-control" placeholder="PC, Laptop, Peripheral, Network"></div><div class="mb-3"><label class="form-label">Unit</label><input name="unit" class="form-control" value="pcs"></div></div><div class="modal-footer"><button class="btn btn-light" data-bs-dismiss="modal" type="button">Batal</button><button class="btn btn-primary" type="submit">Simpan Barang</button></div></form>
+</div></div></div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+const KEY='it_inventory_ledger_v1';
+let db=JSON.parse(localStorage.getItem(KEY)||'{"items":[],"transactions":[]}');
+const save=()=>localStorage.setItem(KEY,JSON.stringify(db));
+const today=new Date().toISOString().slice(0,10);
+document.getElementById('todayLabel').textContent=new Date().toLocaleDateString('id-ID',{day:'2-digit',month:'long',year:'numeric'});
+function showPage(p){['dashboard','transactions','items'].forEach(x=>document.getElementById(x+'Page').classList.toggle('d-none',x!==p));document.querySelectorAll('[data-page]').forEach(a=>a.classList.toggle('active',a.dataset.page===p));document.getElementById('pageTitle').textContent={dashboard:'Dashboard',transactions:'Riwayat Transaksi',items:'Master Barang'}[p];renderAll();}
+document.querySelectorAll('[data-page]').forEach(a=>a.onclick=e=>{e.preventDefault();showPage(a.dataset.page)});
+function stockFor(name){return db.transactions.filter(t=>t.item.toLowerCase()===name.toLowerCase()).reduce((s,t)=>s+(t.type==='Masuk'?Number(t.qty):-Number(t.qty)),0)}
+function renderAll(){renderDashboard();renderTransactions();renderItems();fillItemList()}
+function renderDashboard(){
+document.getElementById('statItems').textContent=db.items.length;
+document.getElementById('statStock').textContent=db.items.reduce((s,i)=>s+stockFor(i.name),0);
+document.getElementById('statIn').textContent=db.transactions.filter(t=>t.type==='Masuk').reduce((s,t)=>s+Number(t.qty),0);
+document.getElementById('statOut').textContent=db.transactions.filter(t=>t.type==='Keluar').reduce((s,t)=>s+Number(t.qty),0);
+let rows=[...db.transactions].sort((a,b)=>b.date.localeCompare(a.date)).slice(0,8);
+document.getElementById('recentTable').innerHTML=rows.length?rows.map(t=>`<tr><td>${esc(t.date)}</td><td><b>${esc(t.item)}</b></td><td><span class="badge ${t.type==='Masuk'?'badge-in':'badge-out'}">${t.type}</span></td><td>${t.qty}</td><td>${esc(t.from||'-')}</td><td>${esc(t.to||'-')}</td><td>${esc(t.reason||'-')}</td></tr>`).join(''):'<tr><td colspan="7" class="text-center text-muted py-4">Belum ada transaksi.</td></tr>';
+}
+function renderTransactions(){
+let q=(document.getElementById('transactionSearch')?.value||'').toLowerCase(),type=document.getElementById('typeFilter')?.value||'',date=document.getElementById('dateFilter')?.value||'';
+let rows=[...db.transactions].sort((a,b)=>b.date.localeCompare(a.date)).filter(t=>(!type||t.type===type)&&(!date||t.date===date)&&[t.item,t.from,t.to,t.reason,t.pr].join(' ').toLowerCase().includes(q));
+document.getElementById('transactionTable').innerHTML=rows.length?rows.map((t,i)=>`<tr><td>${i+1}</td><td>${esc(t.date)}</td><td><b>${esc(t.item)}</b></td><td><span class="badge ${t.type==='Masuk'?'badge-in':'badge-out'}">${t.type}</span></td><td>${t.qty}</td><td>${esc(t.from||'-')}</td><td>${esc(t.to||'-')}</td><td>${esc(t.reason||'-')}</td><td>${esc(t.pr||'-')}</td><td>${esc(t.remarks||'-')}</td><td><button class="btn btn-sm btn-outline-danger" onclick="deleteTransaction('${t.id}')" title="Hapus"><i class="bi bi-trash"></i></button></td></tr>`).join(''):'<tr><td colspan="11" class="text-center text-muted py-4">Transaksi tidak ditemukan.</td></tr>';
+}
+function renderItems(){
+let q=(document.getElementById('itemSearch')?.value||'').toLowerCase();
+let rows=db.items.filter(i=>(i.name+' '+i.category).toLowerCase().includes(q));
+document.getElementById('itemTable').innerHTML=rows.length?rows.map(i=>`<tr><td><b>${esc(i.name)}</b></td><td>${esc(i.category||'-')}</td><td>${esc(i.unit||'pcs')}</td><td><span class="badge ${stockFor(i.name)<0?'bg-danger':'bg-primary-subtle text-primary'}">${stockFor(i.name)}</span></td><td><button class="btn btn-sm btn-outline-danger" onclick="deleteItem('${i.id}')"><i class="bi bi-trash"></i></button></td></tr>`).join(''):'<tr><td colspan="5" class="text-center text-muted py-4">Master barang masih kosong.</td></tr>';
+}
+function fillItemList(){document.getElementById('itemList').innerHTML=db.items.map(i=>`<option value="${esc(i.name)}">`).join('')}
+function openTransaction(){let f=document.getElementById('transactionForm');f.reset();f.elements.date.value=today;new bootstrap.Modal(document.getElementById('transactionModal')).show()}
+function openItem(){document.getElementById('itemForm').reset();new bootstrap.Modal(document.getElementById('itemModal')).show()}
+document.getElementById('transactionForm').onsubmit=e=>{e.preventDefault();let f=e.target,d=Object.fromEntries(new FormData(f));if(d.type==='Keluar'&&stockFor(d.item)<Number(d.qty)){if(!confirm('Stok saat ini tidak mencukupi. Tetap simpan transaksi?'))return;}db.transactions.push({...d,id:crypto.randomUUID()});if(!db.items.some(i=>i.name.toLowerCase()===d.item.toLowerCase()))db.items.push({id:crypto.randomUUID(),name:d.item,category:'',unit:'pcs'});save();bootstrap.Modal.getInstance(document.getElementById('transactionModal')).hide();renderAll();};
+document.getElementById('itemForm').onsubmit=e=>{e.preventDefault();let d=Object.fromEntries(new FormData(e.target));if(db.items.some(i=>i.name.toLowerCase()===d.name.toLowerCase()))return alert('Barang tersebut sudah ada di master.');db.items.push({...d,id:crypto.randomUUID()});save();bootstrap.Modal.getInstance(document.getElementById('itemModal')).hide();renderAll();};
+function deleteTransaction(id){if(confirm('Hapus transaksi ini? Stok akan ikut diperbarui.')){db.transactions=db.transactions.filter(t=>t.id!==id);save();renderAll()}}
+function deleteItem(id){let item=db.items.find(i=>i.id===id);if(db.transactions.some(t=>t.item.toLowerCase()===item.name.toLowerCase()))return alert('Barang memiliki riwayat transaksi. Tidak dapat dihapus.');if(confirm('Hapus barang dari master?')){db.items=db.items.filter(i=>i.id!==id);save();renderAll()}}
+function exportCSV(){let data=[['No','Date','Device Name','Type','Qty','From','To','Reason','Nomer PR','Remarks'],...db.transactions.map((t,i)=>[i+1,t.date,t.item,t.type,t.qty,t.from,t.to,t.reason,t.pr,t.remarks])];let csv=data.map(r=>r.map(v=>'"'+String(v??'').replaceAll('"','""')+'"').join(',')).join('\\r\\n');let blob=new Blob(['\\ufeff'+csv],{type:'text/csv;charset=utf-8'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='IT_Inventory_Transactions.csv';a.click();URL.revokeObjectURL(a.href)}
+function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+renderAll();
+</script>
+</body>
+</html>
